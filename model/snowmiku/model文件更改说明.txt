@@ -1,0 +1,4 @@
+    "textures": [
+        "https://teachermate.oss-cn-qingdao.aliyuncs.com/PjKgz-1728558308008-texture_00.png"
+        // 上面是oss，来源https://www.nekopara.uk/archives/261.html 
+        // "textures/texture_00.png" 这个是源文件路径

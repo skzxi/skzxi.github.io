@@ -1,0 +1,919 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=dark>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/taichifavicon.gif">
+  <link rel="icon" href="/img/taichifavicon.gif">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#b0dbfa">
+  <meta name="author" content="SKzxi">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="教程向文章，介绍如何在原生Windows系统中，通过纯血ROCm7与PyTorch2.9运行Stable Diffusion，无需WSL或虚拟机环境或ZLUDA，即可在AMD显卡上实现满血AI绘图。同时还有绘世启动器的配置说明">
+<meta property="og:type" content="article">
+<meta property="og:title" content="更新！更好！AMD显卡在原生Windows环境下运行Stable Diffusion：纯血ROCm7 + PyTorch2.9 实现，以及绘世启动器配置指南">
+<meta property="og:url" content="http://skzxi.github.io/2025/10/18/amdgpu-windows-stable-diffusion-rocm7-pytorch2-9-launcher/index.html">
+<meta property="og:site_name" content="SKzxi的小窝">
+<meta property="og:description" content="教程向文章，介绍如何在原生Windows系统中，通过纯血ROCm7与PyTorch2.9运行Stable Diffusion，无需WSL或虚拟机环境或ZLUDA，即可在AMD显卡上实现满血AI绘图。同时还有绘世启动器的配置说明">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-10-18T13:45:13.000Z">
+<meta property="article:modified_time" content="2025-11-02T07:50:13.000Z">
+<meta property="article:author" content="SKzxi">
+<meta property="article:tag" content="AMD">
+<meta property="article:tag" content="ROCm">
+<meta property="article:tag" content="PyTorch">
+<meta property="article:tag" content="Stable Diffusion">
+<meta property="article:tag" content="Windows">
+<meta property="article:tag" content="绘世启动器">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>更新！更好！AMD显卡在原生Windows环境下运行Stable Diffusion：纯血ROCm7 + PyTorch2.9 实现，以及绘世启动器配置指南 - SKzxi的小窝</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/scroll.css">
+<link rel="stylesheet" href="/css/gradient.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"skzxi.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":30,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":6},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":false,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"RmRgyBt6LNDqReY2Y5jcVCKS-gzGzoHsz","app_key":"jTeJBu9GMzZDdPCfzBAHDvfZ","server_url":"https://rmrgybt6.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":true},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+<body>
+
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>SKzxi的小窝</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tools/" target="_self">
+                <i class="iconfont icon-briefcase"></i>
+                <span>工具</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/2025/01/08/blog-logs/" target="_self">
+                <i class="iconfont icon-top"></i>
+                <span>Updates</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/taichi.gif') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="更新！更好！AMD显卡在原生Windows环境下运行Stable Diffusion：纯血ROCm7 + PyTorch2.9 实现，以及绘世启动器配置指南"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-10-18 21:45" pubdate>
+          2025年10月18日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          17 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+ 
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">更新！更好！AMD显卡在原生Windows环境下运行Stable Diffusion：纯血ROCm7 + PyTorch2.9 实现，以及绘世启动器配置指南</h1>
+            
+              <p id="updated-time" class="note note-info" style="">
+                
+                  
+                    本文最后更新于 2025年11月2日 下午
+                  
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <div class="note note-info">
+            <p><strong>简单说明</strong><br>在Windows平台上，AMD显卡长期以来在AI绘图领域不如NVIDIA主流显卡普及，主要因为CUDA生态对NVIDIA优化，而ROCm（Radeon Open Compute）则是AMD官方提供的开源高性能计算框架，用于在AMD GPU上运行深度学习模型。随着ROCm对Windows的原生支持提高以及PyTorch的兼容升级，AMD用户现已可以在纯原生Windows环境下运行Stable Diffusion，而无需依赖WSL或虚拟机环境或ZLUDA转译<br>本文将基于该环境，演示如何配置ROCm+PyTorch并运行Stable Diffusion，以及绘世启动器的配置方法。接下来，我们直接进入环境搭建与教程操作</p>
+          </div>
+<h2 id="安装Stable-Diffusion-WebUI"><a href="#安装Stable-Diffusion-WebUI" class="headerlink" title="安装Stable Diffusion WebUI"></a>安装Stable Diffusion WebUI</h2><h3 id="选择1：直接安装"><a href="#选择1：直接安装" class="headerlink" title="选择1：直接安装"></a>选择1：直接安装</h3><div class="note note-primary">
+            <p>开始前请确保已安装Git以及Python3.11或3.12，这里仅作简单说明，具体教程请自行搜索</p>
+          </div>
+<ol>
+<li>新建文件夹并重命名为WebUI，注意路径最好为纯英文路径，例如：<code>E:\SKzxi\WebUI</code></li>
+<li>打开终端进入此文件夹，然后使用git clone命令下载你需要的webui</li>
+<li>下载完成后，先不要启动，需要编辑<code>webui-user.bat</code>文件，<br>在echo off下方的第二行添加：<figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bat"><span class="hljs-built_in">set</span> TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=<span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+在<code>COMMANDLINE_ARGS=</code>这一行：<br>对于Automatic1111，添加（opt-sdp-attention速度非常快但不稳定，也可以不添加）<figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bat">--skip-python-version-check --opt-sdp-attention<br></code></pre></td></tr></table></figure>
+对于Forge&#x2F;ReForge&#x2F;ForgeNeo，添加<figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bat">--skip-python-version-check --cuda-stream --attention-pytorch<br></code></pre></td></tr></table></figure>
+对于ComfyUI，使用<figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bat">--use-pytorch-cross-attention --reserve-vram <span class="hljs-number">0</span>.<span class="hljs-number">5</span><br></code></pre></td></tr></table></figure></li>
+<li>运行<code>webui-user.bat</code>，等待其完成所有安装并打开浏览器，完成后将其关闭</li>
+</ol>
+<h3 id="选择2：秋葉整合包（推荐）"><a href="#选择2：秋葉整合包（推荐）" class="headerlink" title="选择2：秋葉整合包（推荐）"></a>选择2：秋葉整合包（推荐）</h3><div class="note note-primary">
+            <p><strong>注意</strong><br>接下来的教程将以forge整合包为例，其他整合包应该也一样（我暂未进行测试），至于直接安装的，请自行类比，思路和过程是同样的</p>
+          </div>
+<ol>
+<li>按需选择下载 <a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1iM4y1y7oA">A41整合包</a> | <a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1rc6nYNEYo">Forge整合包</a> | <a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1Ew411776J">ComfyUI整合包</a></li>
+<li>确保下载的压缩包无误，然后解压到任意文件夹</li>
+<li>注意先不要运行</li>
+</ol>
+<h2 id="配置环境"><a href="#配置环境" class="headerlink" title="配置环境"></a>配置环境</h2><div class="note note-primary">
+            <p>如果是<strong>切换至ROCm6 PyTorh2.7（备选）</strong>则可以跳过该项</p>
+          </div>
+<p>首先需要安装<code>Visual Studio</code>，<a target="_blank" rel="noopener" href="https://visualstudio.microsoft.com/zh-hans/">官网</a><br>进入后点击<code>下载 Visual Studio</code>，双击运行下载的程序，安装完成后<br>来到主页面，点击<code>可用</code>，选择<code>visual studio community 2022</code>，点击后面的<code>安装</code>，然后在弹出的页面选择<code>单个组件</code>，<br>分别搜索并勾选下列3项（我确定这是编译所需的最小安装，不需要安装<code>C++桌面开发</code>）</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text">MSVC v143 - VS 2022 C++ x64/x86 生成工具(最新)<br>Windows 11 SDK (10.0.26100.4654) | Windows 10 SDK (10.0.19041.0) #这两个根据你的系统二选一<br>用于 Windows 的 C++ CMake 工具<br></code></pre></td></tr></table></figure>
+<p>点击右下角的<code>安装</code>并等待安装完成</p>
+<h2 id="切换至ROCm7-PyTorh2-9"><a href="#切换至ROCm7-PyTorh2-9" class="headerlink" title="切换至ROCm7 PyTorh2.9"></a>切换至ROCm7 PyTorh2.9</h2><h3 id="确认GFX版本"><a href="#确认GFX版本" class="headerlink" title="确认GFX版本"></a>确认GFX版本</h3><p>先确认你的AMD GPU的GFX版本，可以自行查询或问ai<br>个人建议的方法：使用<code>TechPowerUp</code>网站进行查询，如我的GPU是AMD Radeon 760M，在任意搜索引擎输入<code>AMD Radeon 760M site:techpowerup.com</code>进行搜索，打开对应的网站，确认是你的同款GPU，然后下拉到<code>GPU Notes</code>这一栏，查看<code>Shader ISA</code>这一行，如我的是<code>Shader ISA: GFX11.0 (gfx1103)</code>,记住括号里的这个值<code>gfx1103</code>，后面有用</p>
+<h3 id="卸载已安装的torch"><a href="#卸载已安装的torch" class="headerlink" title="卸载已安装的torch"></a>卸载已安装的torch</h3><p>直接安装的你自己应该知道怎么打开终端<br>对于整合包用户，打开整合包根目录，找到python这个文件夹，进入，然后在地址栏输入<code>cmd</code>，回车，弹出终端页面（注：后文所说的终端都是这个终端）<br>然后输入命令回车后输入y确认卸载<code>torch torchvision torchaudio</code></p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cmd">python -m pip uninstall torch torchvision torchaudio<br></code></pre></td></tr></table></figure>
+<p>卸载xformers（a卡一般用不上）</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cmd">python -m pip uninstall xformers<br></code></pre></td></tr></table></figure>
+<p>卸载bnb（a卡完全用不了）</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cmd">python -m pip uninstall bitsandbytes<br></code></pre></td></tr></table></figure>
+<h3 id="安装rocm-torch"><a href="#安装rocm-torch" class="headerlink" title="安装rocm_torch"></a>安装rocm_torch</h3><div class="note note-primary">
+            <p><strong>说明</strong><br>这里使用的是<a target="_blank" rel="noopener" href="https://github.com/ROCm/TheRock"><strong>开源社区TheRock</strong></a>编译的whl，因为<a target="_blank" rel="noopener" href="https://repo.radeon.com/rocm/windows/rocm-rel-6.4.4/"><strong>AMD官方</strong></a>只提供了torch-2.8+rocm6.4.4-cp312这一个版本</p>
+          </div>
+<p>在终端中输入命令，注意网址中的<code>gfx110X-dgpu</code>需对应你的gfx，如我是<code>gfx1103</code>则选择<code>gfx110X-dgpu</code>，参考该列表将<code>gfx110X-dgpu</code>更改为你对应的gfx版本</p>
+<ul>
+<li>gfx110X-dgpu</li>
+<li>gfx1151</li>
+<li>gfx120X-all</li>
+<li>gfx94X-dcgpu</li>
+<li>gfx950-dcgpu</li>
+</ul>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cmd">python -m pip install --index-url https://d2awnip2yjpvqn.cloudfront.<span class="hljs-built_in">net</span>/v2/gfx110X-dgpu/ torch torchvision torchaudio<br></code></pre></td></tr></table></figure>
+<p>等待直到安装完成</p>
+<p>如果出现如下提示，将提示中的路径<code>youpath\python\Scripts</code>添加到环境变量即可</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cmd"><span class="hljs-function">WARNING: <span class="hljs-title">The</span> <span class="hljs-title">script</span> <span class="hljs-title">XXX</span> <span class="hljs-title">is</span> <span class="hljs-title">installed</span> <span class="hljs-title">in</span> &#x27;<span class="hljs-title">youpath</span>\<span class="hljs-title">python</span>\<span class="hljs-title">Scripts</span>&#x27; <span class="hljs-title">which</span> <span class="hljs-title">is</span> <span class="hljs-title">not</span> <span class="hljs-title">on</span> <span class="hljs-title">PATH</span>.</span><br><span class="hljs-function"><span class="hljs-title">Consider</span> <span class="hljs-title">adding</span> <span class="hljs-title">this</span> <span class="hljs-title">directory</span> <span class="hljs-title">to</span> <span class="hljs-title">PATH</span> <span class="hljs-title">or</span>, <span class="hljs-title">if</span> <span class="hljs-title">you</span> <span class="hljs-title">prefer</span> <span class="hljs-title">to</span> <span class="hljs-title">suppress</span> <span class="hljs-title">this</span> <span class="hljs-title">warning</span>, <span class="hljs-title">use</span> -<span class="hljs-title">no</span>-<span class="hljs-title">warn</span>-<span class="hljs-title">script</span>-<span class="hljs-title">location</span></span><br></code></pre></td></tr></table></figure>
+<h3 id="验证安装"><a href="#验证安装" class="headerlink" title="验证安装"></a>验证安装</h3><p>在终端输入<code>python</code>进入交互模式，然后分别输入<code>import torch</code> <code>print(torch.__version__)</code> <code>print(torch.version.hip)</code><br>输出类似如下则安装成功</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python">E:\sd-webui-forge-aki-v1<span class="hljs-number">.0</span>\python&gt;python<br>Python <span class="hljs-number">3.11</span><span class="hljs-number">.9</span> (tags/v3<span class="hljs-number">.11</span><span class="hljs-number">.9</span>:de54cf5, Apr  <span class="hljs-number">2</span> <span class="hljs-number">2024</span>, <span class="hljs-number">10</span>:<span class="hljs-number">12</span>:<span class="hljs-number">12</span>) [MSC v<span class="hljs-number">.1938</span> <span class="hljs-number">64</span> bit (AMD64)] on win32<br><span class="hljs-type">Type</span> <span class="hljs-string">&quot;help&quot;</span>, <span class="hljs-string">&quot;copyright&quot;</span>, <span class="hljs-string">&quot;credits&quot;</span> <span class="hljs-keyword">or</span> <span class="hljs-string">&quot;license&quot;</span> <span class="hljs-keyword">for</span> more information.<br><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-keyword">import</span> torch<br><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-built_in">print</span>(torch.__version__)<br><span class="hljs-number">2.9</span><span class="hljs-number">.0</span>+rocm7<span class="hljs-number">.10</span><span class="hljs-number">.0</span>a20251018<br><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-built_in">print</span>(torch.version.hip)<br><span class="hljs-number">7.1</span><span class="hljs-number">.25416</span>-d0220ec212<br>&gt;&gt;&gt;<br></code></pre></td></tr></table></figure>
+<p>按<code>ctrl＋z</code>退出交互模式</p>
+<h2 id="切换至ROCm6-PyTorh2-7（备选）"><a href="#切换至ROCm6-PyTorh2-7（备选）" class="headerlink" title="切换至ROCm6 PyTorh2.7（备选）"></a>切换至ROCm6 PyTorh2.7（备选）</h2><div class="note note-primary">
+            <p><strong>注意</strong><br>如果<strong>切换至ROCm7 PyTorh2.9</strong>过程中出现太多问题，建议使用这一方案<br>但是此方案仅支持<code>gfx110x gfx1151 gfx1201</code></p>
+          </div>
+<h3 id="卸载已安装的torch-1"><a href="#卸载已安装的torch-1" class="headerlink" title="卸载已安装的torch"></a>卸载已安装的torch</h3><p>直接安装的你自己应该知道怎么打开终端<br>对于整合包用户，打开整合包根目录，找到python这个文件夹，进入，然后在地址栏输入<code>cmd</code>，回车，弹出终端页面<br>然后输入命令回车后输入y确认卸载<code>torch torchvision torchaudio</code></p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cmd">python -m pip uninstall torch torchvision torchaudio<br></code></pre></td></tr></table></figure>
+<p>卸载<code>xformers</code>（a卡一般用不上）</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cmd">python -m pip uninstall xformers<br></code></pre></td></tr></table></figure>
+<p>卸载<code>bnb</code>（a卡完全用不了）</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cmd">python -m pip uninstall bitsandbytes<br></code></pre></td></tr></table></figure>
+<h3 id="确认python版本"><a href="#确认python版本" class="headerlink" title="确认python版本"></a>确认python版本</h3><p>在终端中输入<code>python --version</code>回车，如我的是<code>python3.11</code></p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cmd"><span class="hljs-function">E:\<span class="hljs-title">sd</span>-<span class="hljs-title">webui</span>-<span class="hljs-title">forge</span>-<span class="hljs-title">aki</span>-<span class="hljs-title">v1</span>.0\<span class="hljs-title">python</span>&gt;<span class="hljs-title">python</span> --<span class="hljs-title">version</span></span><br><span class="hljs-function"><span class="hljs-title">Python</span> 3.11.9</span><br></code></pre></td></tr></table></figure>
+<p>记住你的python版本</p>
+<h3 id="下载torch"><a href="#下载torch" class="headerlink" title="下载torch"></a>下载torch</h3><p>打开此<a target="_blank" rel="noopener" href="https://github.com/scottt/rocm-TheRock/releases/tag/v6.5.0rc-pytorch-gfx110x">releases</a>页<br>然后根据python版本选择需要下载的3个文件，如我是python3.11，需要下载带有<code>cp311</code>的这3个</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text">torch-2.7.0a0+rocm_git3f903c3-cp311-cp311-win_amd64.whl<br>torchaudio-2.7.0a0+52638ef-cp311-cp311-win_amd64.whl<br>torchvision-0.22.0+9eb57cd-cp311-cp311-win_amd64.whl<br></code></pre></td></tr></table></figure>
+<h3 id="安装torch"><a href="#安装torch" class="headerlink" title="安装torch"></a>安装torch</h3><p>在终端中输入<code>python -m pip install </code>，注意先不要回车<br>然后找到刚才下载的三个文件，依次将3个文件拖入终端，命令应与下行相似</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cmd">python -m pip install D:the_rock\torchvision-<span class="hljs-number">0</span>.<span class="hljs-number">22</span>.<span class="hljs-number">0</span>+<span class="hljs-number">9</span>eb57cd-cp311-cp311-win_amd64.whl D:\the_rock\torch-<span class="hljs-number">2</span>.<span class="hljs-number">7</span>.<span class="hljs-number">0</span>a0+rocm_git3f903c3-cp311-cp311-win_amd64.whl D:\the_rock\torchaudio-<span class="hljs-number">2</span>.<span class="hljs-number">7</span>.<span class="hljs-number">0</span>a0+<span class="hljs-number">52638</span>ef-cp311-cp311-win_amd64.whl<br></code></pre></td></tr></table></figure>
+<p>回车后等待安装，出现<code>Successfully installed torch-2.7.0a0+git3f903c3 torchaudio-2.7.0a0+52638ef torchvision-0.22.0+9eb57cd</code>则安装完成</p>
+<h3 id="验证安装-1"><a href="#验证安装-1" class="headerlink" title="验证安装"></a>验证安装</h3><p>在终端输入<code>python</code>进入交互模式，然后分别输入<code>import torch</code> <code>print(torch.__version__)</code> <code>print(torch.version.hip)</code><br>输出类似如下则安装成功</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python">Python <span class="hljs-number">3.11</span><span class="hljs-number">.9</span> (tags/v3<span class="hljs-number">.11</span><span class="hljs-number">.9</span>:de54cf5, Apr  <span class="hljs-number">2</span> <span class="hljs-number">2024</span>, <span class="hljs-number">10</span>:<span class="hljs-number">12</span>:<span class="hljs-number">12</span>) [MSC v<span class="hljs-number">.1938</span> <span class="hljs-number">64</span> bit (AMD64)] on win32<br><span class="hljs-type">Type</span> <span class="hljs-string">&quot;help&quot;</span>, <span class="hljs-string">&quot;copyright&quot;</span>, <span class="hljs-string">&quot;credits&quot;</span> <span class="hljs-keyword">or</span> <span class="hljs-string">&quot;license&quot;</span> <span class="hljs-keyword">for</span> more information.<br><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-keyword">import</span> torch<br><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-built_in">print</span>(torch.__version__)<br><span class="hljs-number">2.7</span><span class="hljs-number">.0</span>a0+git3f903c3<br><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-built_in">print</span>(torch.version.hip)<br><span class="hljs-number">6.5</span><span class="hljs-number">.25214</span>-5ea90b8c4<br>&gt;&gt;&gt;<br></code></pre></td></tr></table></figure>
+<p>按<code>ctrl＋z</code>退出交互模式</p>
+<div class="note note-primary">
+            <p>直接安装的到这一步就应该结束了，接下来是整合包用启动器启动还需要进行一些配置</p>
+          </div>
+<h2 id="绘世启动器配置指南"><a href="#绘世启动器配置指南" class="headerlink" title="绘世启动器配置指南"></a>绘世启动器配置指南</h2><p>双击打开<code>A绘世启动器</code></p>
+<h3 id="设置"><a href="#设置" class="headerlink" title="设置"></a>设置</h3><p>最上面的<code>配置模式</code>该为<code>高级</code>或<code>专家</code>（出事了请自己负责，不要怪这怪那的）</p>
+<h3 id="高级选项"><a href="#高级选项" class="headerlink" title="高级选项"></a>高级选项</h3><p><code>性能设置</code>这一栏中</p>
+<ol>
+<li><code>生成引擎</code>取消勾选，旁边的GPU选择会变成灰色</li>
+<li><code>Cross-Attention 优化方案</code>选择<code>SDP</code>或<code>Sub-Quadratic</code>（推荐SDP）</li>
+<li><code>计算精度设置</code>中<ul>
+<li><code>通常模型精度</code></li>
+<li><code>文本编码器(Text Encoder)模型精度</code></li>
+<li><code>U-Net模型精度</code></li>
+<li><code>VAE 模型精度</code><br>都改为<code>半精度(FP16)</code><div class="note note-primary">
+            <p>如果选择<code>由**决定</code>,forge会默认直接用FP32，其他的暂未测试</p>
+          </div></li>
+</ul>
+</li>
+</ol>
+<p>然后拉到最下面<code>自定义参数</code>填入<br>A41整合包（opt-sdp-attention速度非常快但不稳定，也可以不添加）</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">--skip-python-version-check --opt-sdp-attention<br></code></pre></td></tr></table></figure>
+<p>Forge整合包</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">--skip-python-version-check --cuda-stream --attention-pytorch<br></code></pre></td></tr></table></figure>
+<p>ComfyUI整合包</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">--use-pytorch-cross-attention --reserve-vram 0.5<br></code></pre></td></tr></table></figure>
+<h2 id="一键启动"><a href="#一键启动" class="headerlink" title="一键启动"></a>一键启动</h2><p>点击<code>一键启动</code><br>Stable Diffusion 启动！！！</p>
+<div class="note note-primary">
+            <p><strong>需要注意的是</strong><br>首次生图或进行高清修复时，系统可能出现严重卡顿甚至导致GPU驱动崩溃，此后的操作通常会恢复正常，但若设置过高修复倍数或执行其他高性能任务仍可能复发<br>此问题为当前版本已知缺陷，将在TheRock后续更新中修复<br>建议进行高清修复时同时启用Tiled VAE选项可大幅缓解该问题</p>
+          </div>
+
+<p>这样AMD GPU就可以在Windows原生环境下使用ROCm PyTorch运行Stable Diffusion了</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%95%99%E7%A8%8B/" class="category-chain-item">教程</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AMD/" class="print-no-link">#AMD</a>
+      
+        <a href="/tags/ROCm/" class="print-no-link">#ROCm</a>
+      
+        <a href="/tags/PyTorch/" class="print-no-link">#PyTorch</a>
+      
+        <a href="/tags/Stable-Diffusion/" class="print-no-link">#Stable Diffusion</a>
+      
+        <a href="/tags/Windows/" class="print-no-link">#Windows</a>
+      
+        <a href="/tags/%E7%BB%98%E4%B8%96%E5%90%AF%E5%8A%A8%E5%99%A8/" class="print-no-link">#绘世启动器</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>更新！更好！AMD显卡在原生Windows环境下运行Stable Diffusion：纯血ROCm7 + PyTorch2.9 实现，以及绘世启动器配置指南</div>
+      <div>http://skzxi.github.io/2025/10/18/amdgpu-windows-stable-diffusion-rocm7-pytorch2-9-launcher/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>SKzxi</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年10月18日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2025年11月2日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/08/23/theme-blog-post-test/" title="fluid主题文章展示">
+                        <span class="hidden-mobile">fluid主题文章展示</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+    <div id="giscus" class="giscus"></div>
+    <script type="text/javascript">
+      Fluid.utils.loadComments('#giscus', function() {
+        var options = {"repo":"skzxi/skzxi.github.io","repo-id":"R_kgDOPUzgYw","category":"Announcements","category-id":"DIC_kwDOPUzgY84CugpM","theme-light":"light","theme-dark":"dark","mapping":"pathname","reactions-enabled":1,"emit-metadata":0,"input-position":"top","lang":"zh-CN"};
+        var attributes = {};
+        for (let option in options) {
+          if (!option.startsWith('theme-')) {
+            var key = option.startsWith('data-') ? option : 'data-' + option;
+            attributes[key] = options[option];
+          }
+        }
+        var light = 'light';
+        var dark = 'dark';
+        window.GiscusThemeLight = light;
+        window.GiscusThemeDark = dark;
+        attributes['data-theme'] = document.documentElement.getAttribute('data-user-color-scheme') === 'dark' ? dark : light;
+        for (let attribute in attributes) {
+          var value = attributes[attribute];
+          if (value === undefined || value === null || value === '') {
+            delete attributes[attribute];
+          }
+        }
+        var s = document.createElement('script');
+        s.setAttribute('src', 'https://giscus.app/client.js');
+        s.setAttribute('crossorigin', 'anonymous');
+        for (let attribute in attributes) {
+          s.setAttribute(attribute, attributes[attribute]);
+        }
+        var ss = document.getElementsByTagName('script');
+        var e = ss.length > 0 ? ss[ss.length - 1] : document.head || document.documentElement;
+        e.parentNode.insertBefore(s, e.nextSibling);
+      });
+    </script>
+    <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       ©2025 By <a href="/about" target="_blank" rel="nofollow noopener">SKzxi</a><br> <div> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 框架 <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo 7.3.0</span></a> <i class="iconfont icon-love"></i> 主题 <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid 1.9.8</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/duration.js"></script>
+<script src="/js/sakura.js"></script>
+<script src="/js/random-img.js"></script>
+<script src="/js/fireworks.js"></script>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/axios@1.3.4/dist/axios.min.js"></script>
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<!-- hexo injector body_end start --><script data-pjax src="https://unpkg.com/oh-my-live2d"></script><script>const oml2d = OML2D.loadOml2d({dockedPosition:"left",mobileDisplay:true,models:[{"path":"/model/snowmiku/model.json","mobilePosition":[-65,0],"mobileScale":0.072,"mobileStageStyle":{"width":180,"height":180},"motionPreloadStrategy":"IDLE","position":[-90,0],"scale":0.1,"stageStyle":{"width":250,"height":250}}],parentElement:document.body,primaryColor:"var(--btn-bg)",sayHello:false,tips:{style: {"width":230,"height":120,"left":"calc(50% - 20px)","top":"-100px"},mobileStyle: {"width":180,"height":80,"left":"calc(50% - 30px)","top":"-100px"},idleTips:{interval:15000,message:function(){
+  return axios.get('https://v1.hitokoto.cn?c=i')
+    .then(function (response) {
+      return response.data.hitokoto ;
+    })
+    .catch(function (error) {
+      console.error(error);
+    });
+}
+}}});</script><!-- hexo injector body_end end --></body>
+</html>
